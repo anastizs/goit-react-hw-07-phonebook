@@ -1,31 +1,42 @@
 import { useSelector, useDispatch } from "react-redux";
-
-import { getFilter, getContacts } from "redux/selectors";
-import { deleteContact } from "redux/contactsSlice";
+import { useEffect } from "react";
+import {
+  selectIsLoading,
+  selectError,
+  selectVisibleContacts,
+} from "redux/selectors";
+import { fetchContacts, deleteContact } from "redux/operations";
 import ContactItem from "components/ContactItem/ContactItem";
-import { List } from "./ContactList.styled";
+import { List, Error } from "./ContactList.styled";
+import { Loader } from "components/Loader/Loader";
 
 export const ContactList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
+  const contacts = useSelector(selectVisibleContacts);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
   const dispatch = useDispatch();
 
-  const visibleContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter)
-  );
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   return (
-    <List>
-      {visibleContacts.map(({ id, name, number }) => (
-        <ContactItem
-          key={id}
-          name={name}
-          number={number}
-          onDelete={() => {
-            dispatch(deleteContact(id));
-          }}
-        />
-      ))}
-    </List>
+    <>
+      {" "}
+      {isLoading && <Loader />}
+      {error && <Error>{error}</Error>}
+      <List>
+        {contacts.map(({ id, name, number }) => (
+          <ContactItem
+            key={id}
+            name={name}
+            number={number}
+            onDelete={() => {
+              dispatch(deleteContact(id));
+            }}
+          />
+        ))}
+      </List>
+    </>
   );
 };

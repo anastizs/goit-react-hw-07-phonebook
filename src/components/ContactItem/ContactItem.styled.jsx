@@ -7,7 +7,7 @@ export const Item = styled.li`
 `;
 
 export const TextName = styled.p`
-  width: 144px;
+  width: 180px;
   padding: 0;
   margin: 0;
 `;
